@@ -1,5 +1,5 @@
 """
-cyberHunt Parser - Complete AST builder
+cyberHunt Parser - Complete AST builder with function support
 Converts tokens to Abstract Syntax Tree
 """
 
@@ -86,8 +86,12 @@ class Parser:
         
         token = self.current_token()
         
+        # Function definition
+        if token.type == TokenType.FUNC:
+            return self.parse_function_def()
+        
         # Print statement
-        if token.type == TokenType.LIKHO:
+        elif token.type == TokenType.LIKHO:
             return self.parse_likho()
         
         # If statement
@@ -102,9 +106,9 @@ class Parser:
         elif token.type == TokenType.RETURN:
             return self.parse_return()
         
-        # Assignment or input
+        # Assignment or input or function call
         elif token.type == TokenType.IDENTIFIER:
-            return self.parse_assignment_or_input()
+            return self.parse_assignment_or_input_or_call()
         
         # Skip newlines and empty statements
         elif token.type in [TokenType.NEWLINE, TokenType.EOF, TokenType.KHATAM, TokenType.VARNA]:
@@ -113,6 +117,119 @@ class Parser:
         
         else:
             self.error(f"Unexpected token: {token.type.name}")
+    
+    def parse_function_def(self) -> Dict:
+        """Parse function definition: func naam(param1, param2) ... khatam"""
+        self.expect(TokenType.FUNC)
+        
+        # Get function name
+        func_name = self.expect(TokenType.IDENTIFIER).value
+        
+        # Parse parameters
+        self.expect(TokenType.LPAREN)
+        parameters = []
+        
+        while self.current_token().type != TokenType.RPAREN:
+            param_name = self.expect(TokenType.IDENTIFIER).value
+            parameters.append(param_name)
+            
+            if self.current_token().type == TokenType.COMMA:
+                self.advance()
+            elif self.current_token().type != TokenType.RPAREN:
+                self.error("Expected ',' or ')' in parameter list")
+        
+        self.expect(TokenType.RPAREN)
+        self.skip_newlines()
+        
+        # Parse function body
+        body = []
+        return_stmt = None
+        
+        while self.current_token().type not in [TokenType.KHATAM, TokenType.EOF]:
+            if self.current_token().type == TokenType.RETURN:
+                return_stmt = self.parse_return()
+            else:
+                stmt = self.parse_statement()
+                if stmt:
+                    body.append(stmt)
+            self.skip_newlines()
+        
+        self.expect(TokenType.KHATAM)
+        
+        return {
+            'type': 'function_def',
+            'name': func_name,
+            'parameters': parameters,
+            'body': body,
+            'return': return_stmt
+        }
+    
+    def parse_assignment_or_input_or_call(self) -> Dict:
+        """Parse assignment, input, or function call"""
+        var_name = self.expect(TokenType.IDENTIFIER).value
+        
+        # Function call: naam()
+        if self.current_token().type == TokenType.LPAREN:
+            self.advance()
+            args = []
+            
+            while self.current_token().type != TokenType.RPAREN:
+                args.append(self.parse_expression())
+                if self.current_token().type == TokenType.COMMA:
+                    self.advance()
+                elif self.current_token().type != TokenType.RPAREN:
+                    self.error("Expected ',' or ')' in function call")
+            
+            self.expect(TokenType.RPAREN)
+            
+            return {
+                'type': 'function_call',
+                'name': var_name,
+                'args': args
+            }
+        
+        # Assignment: var = value
+        elif self.current_token().type == TokenType.ASSIGN:
+            self.advance()
+            
+            # Check for input
+            if self.current_token().type == TokenType.INPUT:
+                self.advance()
+                prompt = None
+                
+                # Optional prompt string
+                if self.current_token().type == TokenType.STRING:
+                    prompt = self.parse_expression()
+                
+                return {
+                    'type': 'input',
+                    'var': var_name,
+                    'prompt': prompt
+                }
+            else:
+                # Regular assignment
+                value = self.parse_expression()
+                return {
+                    'type': 'assignment',
+                    'name': var_name,
+                    'value': value
+                }
+        
+        elif self.current_token().type == TokenType.INPUT:
+            self.advance()
+            prompt = None
+            
+            if self.current_token().type == TokenType.STRING:
+                prompt = self.parse_expression()
+            
+            return {
+                'type': 'input',
+                'var': var_name,
+                'prompt': prompt
+            }
+        
+        else:
+            self.error(f"Expected '=', '?', or '(' after identifier '{var_name}'")
     
     def parse_likho(self) -> Dict:
         """Parse likho (print) statement: likho "text" or likho var"""
@@ -126,7 +243,7 @@ class Parser:
             args.append(arg)
             
             # Check if there are more arguments
-            if self.current_token().type not in [TokenType.STRING, TokenType.NUMBER, TokenType.IDENTIFIER, TokenType.COLOR_TEXT, TokenType.COLOR_BG]:
+            if self.current_token().type not in [TokenType.STRING, TokenType.NUMBER, TokenType.IDENTIFIER, TokenType.COLOR_TEXT, TokenType.COLOR_BG, TokenType.LPAREN]:
                 break
         
         return {
@@ -202,58 +319,12 @@ class Parser:
             'value': value
         }
     
-    def parse_assignment_or_input(self) -> Dict:
-        """Parse assignment or input: var = value or var = ?"""
-        var_name = self.expect(TokenType.IDENTIFIER).value
-        
-        if self.current_token().type == TokenType.ASSIGN:
-            self.advance()
-            
-            # Check for input
-            if self.current_token().type == TokenType.INPUT:
-                self.advance()
-                prompt = None
-                
-                # Optional prompt string
-                if self.current_token().type == TokenType.STRING:
-                    prompt = self.parse_expression()
-                
-                return {
-                    'type': 'input',
-                    'var': var_name,
-                    'prompt': prompt
-                }
-            else:
-                # Regular assignment
-                value = self.parse_expression()
-                return {
-                    'type': 'assignment',
-                    'name': var_name,
-                    'value': value
-                }
-        
-        elif self.current_token().type == TokenType.INPUT:
-            self.advance()
-            prompt = None
-            
-            if self.current_token().type == TokenType.STRING:
-                prompt = self.parse_expression()
-            
-            return {
-                'type': 'input',
-                'var': var_name,
-                'prompt': prompt
-            }
-        
-        else:
-            self.error(f"Expected '=' or '?' after identifier '{var_name}'")
-    
     def parse_expression(self) -> Any:
         """Parse expression with operator precedence"""
         return self.parse_comparison()
     
     def parse_comparison(self) -> Any:
-        """Parse comparison: bara (>), chhota (<)"""
+        """Parse comparison: bara (>), chhota (<), barabar (==)"""
         left = self.parse_additive()
         
         while self.current_token().type in [TokenType.GREATER, TokenType.LESS, TokenType.EQUAL]:
@@ -312,7 +383,7 @@ class Parser:
         return left
     
     def parse_primary(self) -> Any:
-        """Parse primary values: numbers, strings, variables, colors"""
+        """Parse primary values: numbers, strings, variables, colors, function calls"""
         token = self.current_token()
         
         # Number literal
@@ -340,10 +411,31 @@ class Parser:
                 'value': token.value
             }
         
-        # Variable reference
+        # Variable reference or function call
         elif token.type == TokenType.IDENTIFIER:
             name = token.value
             self.advance()
+            
+            # Check if it's a function call in expression context
+            if self.current_token().type == TokenType.LPAREN:
+                self.advance()
+                args = []
+                
+                while self.current_token().type != TokenType.RPAREN:
+                    args.append(self.parse_expression())
+                    if self.current_token().type == TokenType.COMMA:
+                        self.advance()
+                    elif self.current_token().type != TokenType.RPAREN:
+                        self.error("Expected ',' or ')' in function call")
+                
+                self.expect(TokenType.RPAREN)
+                
+                return {
+                    'type': 'function_call',
+                    'name': name,
+                    'args': args
+                }
+            
             return {
                 'type': 'variable',
                 'name': name

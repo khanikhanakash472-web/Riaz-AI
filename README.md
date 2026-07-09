@@ -2,39 +2,49 @@
 
 A beginner-friendly programming language written entirely in Roman Urdu (Romanized Urdu script). Build console apps AND static websites!
 
-## Features
+## ✨ Features
 
 - ✅ **Roman Urdu Syntax**: Write code in your native language
 - ✅ **Simple & Intuitive**: Designed for beginners
+- ✅ **Functions with Parameters & Returns**: Now fully functional!
+- ✅ **Local & Global Scope**: Proper variable scoping
 - ✅ **Color Support**: Built-in color and background color support
 - ✅ **Web Framework**: Build static HTML websites in Urdu
 - ✅ **Python-based Compiler**: Fast and reliable execution
+- ✅ **Comprehensive Tests**: 25+ test cases included
 - ✅ **Easy to Learn**: No complex symbols, just clear Roman Urdu words
 
-## What's New? 🚀
+## 🚀 What's New in This Version?
 
-### Web Framework (Static Site Generator)
-Now you can build websites completely in Roman Urdu!
+### Complete Functions Support! 🎉
+
+Functions are now fully implemented with:
+- ✅ Parameter passing
+- ✅ Return values
+- ✅ Local variable scoping
+- ✅ Nested function calls
+- ✅ Proper error handling
 
 ```roman urdu
-website = website_banao("Mera Blog")
-
-home = page_banao(website, "index", "Home")
-home.add_heading("Khush Amdeed!")
-home.add_paragraph("Ye mera pehla website hai")
-home.add_button("Learn More", onclick="alert('Hi!')")
-
-about = page_banao(website, "about", "About Me")
-about.add_heading("About Me")
-about.add_paragraph("Main Riaz hoon")
-about.add_link("Back to Home", "index.html")
-
-generate_html(website)
+shuro
+  func add(a, b)
+    return a jodo b
+  khatam
+  
+  result = add(5, 3)
+  likho "Total: " result
+khatam
 ```
 
-Output: Beautiful HTML files in `website_output/` folder!
+## 📦 Installation
 
-## Language Syntax
+```bash
+git clone https://github.com/khanikhanakash472-web/Riaz-AI.git
+cd Riaz-AI
+python compiler.py your_file.ur
+```
+
+## 📚 Language Syntax
 
 ### Basic Structure
 
@@ -87,16 +97,37 @@ jabbtak counter chhota 10
 khatam
 ```
 
+### Functions (NEW!)
+
+```roman urdu
+func greet(name)
+  likho "Salam " name
+khatam
+
+func add(a, b)
+  return a jodo b
+khatam
+
+greet("Ali")
+result = add(5, 3)
+likho result
+```
+
 ### Operators
 
-- `=` : Assignment
-- `bara` : Greater than (>)
-- `chhota` : Less than (<)
-- `barabar` : Equal to (==)
+#### Arithmetic
 - `jodo` : Addition (+)
 - `ghatao` : Subtraction (-)
 - `gunaa` : Multiplication (*)
 - `bhago` : Division (/)
+
+#### Comparison
+- `bara` : Greater than (>)
+- `chhota` : Less than (<)
+- `barabar` : Equal to (==)
+
+#### Assignment
+- `=` : Assign value
 
 ### Color Codes
 
@@ -125,10 +156,9 @@ khatam
 likho "#2 Green Text"
 likho "##3 Blue Background"
 likho "##2;#3 Green Background with Blue Text"
-likho "#1;##7 Red Text on White Background"
 ```
 
-## Web Framework - Building Websites
+## 🌐 Web Framework - Building Websites
 
 ### Web Elements Available
 
@@ -158,14 +188,23 @@ about.add_paragraph("Main Riaz hoon")
 generate_html(website)
 ```
 
-## Example Programs
+## 📖 Example Programs
 
-### Simple Program
+### Hello World
 
 ```roman urdu
 shuro
   likho "#2 Khush Amdeed cyberHunt mein!"
-  naam = ? "Apka naam batao: "
+  likho "Hello World!"
+khatam
+```
+
+### With Input & Output
+
+```roman urdu
+shuro
+  likho "Apka naam batao: "
+  naam = ?
   likho "Salam " naam
 khatam
 ```
@@ -184,17 +223,6 @@ shuro
 khatam
 ```
 
-### With Math
-
-```roman urdu
-shuro
-  num1 = 10
-  num2 = 5
-  sum = num1 jodo num2
-  likho "Total: " sum
-khatam
-```
-
 ### With Loops
 
 ```roman urdu
@@ -207,110 +235,225 @@ shuro
 khatam
 ```
 
-## Installation
+### With Functions
 
-```bash
-git clone https://github.com/riaz4764/cyberHunt.git
-cd cyberHunt
-python compiler.py your_file.ur
+```roman urdu
+shuro
+  func multiply(a, b)
+    return a gunaa b
+  khatam
+  
+  func calculate_total(price, quantity, tax_rate)
+    subtotal = multiply(price, quantity)
+    tax = subtotal gunaa tax_rate
+    return subtotal jodo tax
+  khatam
+  
+  total = calculate_total(100, 5, 0.1)
+  likho "Total Price: " total
+khatam
 ```
 
-## Usage
+### Factorial Function
 
-### Console Programs
-
-Create a file with `.ur` extension:
-
-```bash
-python compiler.py hello.ur
+```roman urdu
+shuro
+  func factorial(n)
+    result = 1
+    counter = 1
+    jabbtak counter barabar n
+      result = result gunaa counter
+      counter = counter jodo 1
+    khatam
+    return result
+  khatam
+  
+  likho "5! = " factorial(5)
+  likho "4! = " factorial(4)
+khatam
 ```
 
-### Websites
-
-Create a website builder file:
+## 🧪 Running Tests
 
 ```bash
-python web_framework.py
-# Or import in your program
+# Run all tests
+python -m pytest tests/test_compiler.py -v
+
+# Or using unittest
+python tests/test_compiler.py
 ```
 
-## Project Structure
+**Test Coverage:**
+- ✅ 25+ test cases
+- ✅ Lexer tests
+- ✅ Parser tests
+- ✅ Interpreter tests
+- ✅ Error handling tests
+- ✅ Function tests
+
+## 📁 Project Structure
 
 ```
 cyberHunt/
-├── README.md
-├── LANGUAGE_SPEC.md
-├── LICENSE
-├── compiler.py
-├── lexer.py
-├── parser.py
-├── interpreter.py
-├── web_framework.py          # NEW!
-├── .gitignore
+├── README.md                    # This file
+├── LANGUAGE_SPEC.md             # Language specification
+├── FUNCTIONS_GUIDE.md           # Functions documentation
+├── TESTING_GUIDE.md             # Testing guide
+├── CHANGELOG.md                 # Version history
+├── LICENSE                      # MIT License
+├── compiler.py                  # Main entry point
+├── lexer.py                     # Tokenization
+├── parser.py                    # AST building (with functions)
+├── interpreter.py              # Execution engine (with functions)
+├── functions.py                # Function management utilities
+├── web_framework.py             # Static site generator
 ├── examples/
 │   ├── hello_world.ur
-│   ├── input_output.ur
 │   ├── conditions.ur
+│   ├── loops.ur
 │   ├── math.ur
 │   ├── colors.ur
-│   └── loops.ur
+│   ├── function_basic.ur        # NEW!
+│   ├── function_math.ur         # NEW!
+│   ├── function_factorial.ur    # NEW!
+│   └── function_nested.ur       # NEW!
 └── tests/
-    └── test_compiler.py
+    └── test_compiler.py         # Comprehensive test suite
 ```
 
-## Quick Start
+## 🎯 Quick Start
 
 ### 1. Console Program
 ```bash
 python compiler.py examples/hello_world.ur
 ```
 
-### 2. Website
-```python
-from web_framework import *
-
-website = website_banao("MyBlog")
-page = page_banao(website, "index", "Home")
-page.add_heading("Khush Amdeed!")
-page.add_paragraph("Welcome to my site")
-generate_html(website)
+### 2. Custom Program
+Create `mera_program.ur`:
+```roman urdu
+shuro
+  likho "#2 Khush Amdeed!"
+  likho "Apka naam kya hai?"
+  naam = ?
+  likho "Salam " naam
+khatam
 ```
 
-## Documentation
+Then run:
+```bash
+python compiler.py mera_program.ur
+```
 
-- **LANGUAGE_SPEC.md** - Complete language specification
-- **examples/** - Sample programs
-- **LICENSE** - MIT License
+### 3. With Functions
+```bash
+python compiler.py examples/function_math.ur
+```
 
-## Roadmap 🗺️
+### 4. Test the Language
+```bash
+python -m pytest tests/test_compiler.py -v
+```
+
+## 📚 Documentation
+
+- **[LANGUAGE_SPEC.md](LANGUAGE_SPEC.md)** - Complete language specification
+- **[FUNCTIONS_GUIDE.md](FUNCTIONS_GUIDE.md)** - Detailed functions guide with examples
+- **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - How to write and run tests
+- **[examples/](examples/)** - Sample programs
+- **[LICENSE](LICENSE)** - MIT License
+
+## 🗺️ Roadmap
 
 - ✅ Console Programs
 - ✅ Web Framework (Static Sites)
-- 🔄 Functions & Advanced Features
+- ✅ **Functions & Advanced Features**
+- ✅ **Local & Global Scoping**
+- ✅ **Comprehensive Testing**
 - 🔄 Database Support
 - 🔄 Dynamic Web Apps
 - 🔄 Mobile Apps
+- 🔄 Recursion Support
 
-## Author
+## 🐛 Known Issues & Limitations
+
+### Current Limitations
+- ❌ No recursion support (yet)
+- ❌ No default function parameters
+- ❌ No variable arguments (*args)
+- ❌ No dictionary/list data types (yet)
+- ❌ No file I/O (yet)
+
+### Error Handling
+The language provides clear error messages:
+- `SyntaxError` - Invalid syntax
+- `NameError` - Undefined variable or function
+- `ValueError` - Invalid value (e.g., division by zero)
+- `TypeError` - Type mismatch
+
+## 👨‍💻 Author
 
 **Riaz Ali** (@riaz4764)
 
-## License
+- Email: riaz.ai.studio@gmail.com
+- GitHub: https://github.com/riaz4764
 
-MIT License - Free to use and modify
+## 📄 License
 
-## Contributing
+MIT License - Free to use and modify. See [LICENSE](LICENSE) file for details.
 
-Contributions welcome! Fork the repo and submit pull requests.
+## 🤝 Contributing
 
-## Support
+Contributions are welcome! Here's how to contribute:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 💬 Support
 
 For issues, questions, or feature requests:
 - Open an issue on GitHub
 - Contact: riaz.ai.studio@gmail.com
+- Check documentation: [FUNCTIONS_GUIDE.md](FUNCTIONS_GUIDE.md)
+
+## 🎓 Learning Resources
+
+### Beginner
+- Start with `examples/hello_world.ur`
+- Move to `examples/conditions.ur`
+- Then try `examples/loops.ur`
+
+### Intermediate
+- Learn functions in `examples/function_basic.ur`
+- Practice math functions in `examples/function_math.ur`
+- Study advanced patterns in `examples/function_nested.ur`
+
+### Advanced
+- Build websites with `web_framework.py`
+- Study `parser.py` and `interpreter.py` for implementation details
+- Contribute new features!
 
 ---
 
 **Made with ❤️ for Urdu-speaking programmers**
 
 **Urdu mein code likho. Apni language main soch. Duniya ko apne ideas de!**
+
+---
+
+## Version History
+
+**v2.0.0** - Complete Functions Support (Current)
+- ✅ Full function definition and calling
+- ✅ Parameter passing
+- ✅ Return values
+- ✅ Local and global scoping
+- ✅ 25+ test cases
+- ✅ Comprehensive documentation
+
+**v1.0.0** - Initial Release
+- Console programs
+- Web framework
+- Basic features

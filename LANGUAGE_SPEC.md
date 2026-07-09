@@ -1,6 +1,6 @@
 """
 cyberHunt Language Specification
-Roman Urdu Programming Language
+Roman Urdu Programming Language - Complete Guide
 """
 
 # LANGUAGE OVERVIEW
@@ -26,7 +26,7 @@ khatam
 | likho | print | Output |
 | ? | input | Input |
 | func | function | Function definition |
-| return | return | Return value |
+| return | return | Return value from function |
 
 ## Variables
 
@@ -112,7 +112,78 @@ Input:
 
 // This is a comment
 
-## Examples
+## FUNCTIONS (NEW!)
+
+### Function Definition
+
+func function_name(param1, param2)
+  // Function body
+  // Local variables here
+  return result
+khatam
+
+### Function Calling
+
+result = function_name(arg1, arg2)
+likho result
+
+### Function with Parameters
+
+func add(a, b)
+  return a jodo b
+khatam
+
+sum = add(5, 3)
+likho sum
+
+### Function with Return Statement
+
+func greet(name)
+  likho "Salam " name
+  return "Done"
+khatam
+
+output = greet("Ali")
+
+### Local Variables
+
+Variables defined inside functions are local to that function:
+
+func test()
+  local_var = "Inside"
+  likho local_var
+khatam
+
+test()
+likho local_var  // Error: not defined
+
+### Global Variables
+
+Variables defined outside functions can be accessed inside:
+
+global_var = "Outside"
+
+func test()
+  likho global_var  // OK
+khatam
+
+test()
+
+### Nested Function Calls
+
+func add(a, b)
+  return a jodo b
+khatam
+
+func double_sum(x, y)
+  sum = add(x, y)
+  return sum gunaa 2
+khatam
+
+result = double_sum(3, 4)
+likho result  // 14
+
+## EXAMPLES
 
 ### Hello World
 shuro
@@ -144,33 +215,144 @@ shuro
   khatam
 khatam
 
-## Execution
+### Loops
+shuro
+  counter = 1
+  jabbtak counter chhota 6
+    likho "#3 Count: " counter
+    counter = counter jodo 1
+  khatam
+khatam
+
+### Functions
+shuro
+  func multiply(x, y)
+    return x gunaa y
+  khatam
+  
+  func calculate_area(length, width)
+    return multiply(length, width)
+  khatam
+  
+  area = calculate_area(5, 10)
+  likho "Area: " area
+khatam
+
+### Factorial with Function
+shuro
+  func factorial(n)
+    result = 1
+    counter = 1
+    jabbtak counter barabar n
+      result = result gunaa counter
+      counter = counter jodo 1
+    khatam
+    return result
+  khatam
+  
+  likho "5! = " factorial(5)
+khatam
+
+## EXECUTION
 
 Command:
   python compiler.py program.ur
 
-Output:
+Process:
   Lexer tokenizes the code
   Parser builds AST
   Interpreter executes AST
 
-## Error Handling
+## ERROR HANDLING
 
 - SyntaxError: Invalid syntax
-- NameError: Undefined variable
-- ValueError: Invalid value
-- ZeroDivisionError: Division by zero
+- NameError: Undefined variable or function
+- ValueError: Invalid value (e.g., division by zero)
+- TypeError: Type mismatch
 
-## Best Practices
+## SCOPE AND VARIABLES
+
+### Global Scope
+Variables defined at program level (outside functions)
+
+global_var = 10
+
+func test()
+  likho global_var  // Can access
+khatam
+
+### Local Scope
+Variables defined inside functions
+
+func test()
+  local_var = "Local"
+  likho local_var  // OK
+khatam
+
+likho local_var  // Error: not defined
+
+### Scope Rules
+1. Local variables shadow global variables
+2. Function parameters are local to that function
+3. Modifications in local scope don't affect global scope
+4. Return values allow communication between scopes
+
+## BEST PRACTICES
 
 1. Use meaningful variable names
+  naam = "Ahmed"  // Good
+  n = "Ahmed"     // Not clear
+
 2. Add comments for clarity
+  // Calculate total price with tax
+  total = price jodo tax
+
 3. Use proper indentation
+  agar condition
+    likho "Indented"
+  khatam
+
 4. Test with simple examples first
-5. Use colors for better UI
 
----
+5. Use functions to organize code
+  func calculate_tax(price)
+    return price gunaa 0.1
+  khatam
 
-Version: 1.0
+6. Use colors for better UI
+  likho "#2 Success: Operation completed"
+
+## LIMITATIONS
+
+Current version:
+- ✅ Functions with parameters and return values
+- ✅ Local and global variable scoping
+- ✅ Basic data types (strings, numbers)
+- ❌ No recursion (yet)
+- ❌ No default function parameters
+- ❌ No variable arguments (*args)
+- ❌ No arrays/lists
+- ❌ No dictionaries
+- ❌ No file I/O
+
+## VERSION
+
+Version: 2.0.0
 Author: Riaz Ali (@riaz4764)
 License: MIT
+Last Updated: 2026-07-09
+
+## CHANGES FROM v1.0.0
+
+- Added complete function support
+- Added parameter passing
+- Added return values
+- Added local/global scoping
+- Enhanced error handling
+- Added comprehensive tests
+- Added detailed documentation
+
+For more information, see:
+- FUNCTIONS_GUIDE.md - Detailed functions guide
+- TESTING_GUIDE.md - Testing information
+- README.md - Main documentation
