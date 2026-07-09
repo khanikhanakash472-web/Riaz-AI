@@ -1,5 +1,5 @@
 """
-cyberHunt Interpreter - Executes AST nodes
+cyberHunt Interpreter - Executes AST nodes with function support
 """
 
 from typing import Any, Dict, List
@@ -33,10 +33,12 @@ class ColorCodes:
 
 class Interpreter:
     def __init__(self):
-        self.variables = {}
+        self.global_variables = {}
+        self.local_variables = {}  # Stack of local scopes
         self.functions = {}
         self.return_value = None
         self.is_returning = False
+        self.call_stack = []
     
     def parse_color_code(self, text: str) -> tuple:
         """Parse color codes from string"""
@@ -84,12 +86,76 @@ class Interpreter:
             return f"{text_code}{content}{reset_code}"
     
     def get_variable(self, name: str) -> Any:
-        if name not in self.variables:
-            raise NameError(f"Variable '{name}' not defined")
-        return self.variables[name]
+        """Get variable from local or global scope"""
+        # Check local scope first
+        if self.local_variables and name in self.local_variables[-1]:
+            return self.local_variables[-1][name]
+        
+        # Check global scope
+        if name in self.global_variables:
+            return self.global_variables[name]
+        
+        raise NameError(f"Variable '{name}' not defined")
     
     def set_variable(self, name: str, value: Any):
-        self.variables[name] = value
+        """Set variable in current scope"""
+        if self.local_variables:
+            # In function scope
+            self.local_variables[-1][name] = value
+        else:
+            # In global scope
+            self.global_variables[name] = value
+    
+    def define_function(self, name: str, parameters: List[str], body: List[Dict], return_stmt: Dict = None):
+        """Define a function"""
+        if name in self.functions:
+            raise NameError(f"Function '{name}' is already defined")
+        
+        self.functions[name] = {
+            'parameters': parameters,
+            'body': body,
+            'return': return_stmt
+        }
+    
+    def call_function(self, name: str, args: List[Any]) -> Any:
+        """Call a user-defined function"""
+        if name not in self.functions:
+            raise NameError(f"Function '{name}' not defined")
+        
+        func_def = self.functions[name]
+        parameters = func_def['parameters']
+        body = func_def['body']
+        return_stmt = func_def['return']
+        
+        # Check argument count
+        if len(args) != len(parameters):
+            raise ValueError(f"Function '{name}' expects {len(parameters)} arguments, got {len(args)}")
+        
+        # Create local scope
+        local_scope = {}
+        for param_name, arg_value in zip(parameters, args):
+            local_scope[param_name] = arg_value
+        
+        self.local_variables.append(local_scope)
+        self.call_stack.append(name)
+        
+        try:
+            # Execute function body
+            for stmt in body:
+                if self.is_returning:
+                    break
+                self.execute_statement(stmt)
+            
+            # Execute return statement if exists
+            if return_stmt and not self.is_returning:
+                self.return_value = self.evaluate_expression(return_stmt['value'])
+        finally:
+            # Pop local scope
+            self.local_variables.pop()
+            self.call_stack.pop()
+            self.is_returning = False
+        
+        return self.return_value
     
     def execute_likho(self, args: List[Any]) -> None:
         """Print statement - likho"""
@@ -115,9 +181,10 @@ class Interpreter:
         
         if isinstance(node, str):
             # Check if it's a variable reference
-            if node in self.variables:
-                return self.variables[node]
-            return node
+            try:
+                return self.get_variable(node)
+            except NameError:
+                return node
         
         if isinstance(node, dict):
             if node.get('type') == 'binop':
@@ -139,11 +206,16 @@ class Interpreter:
                     return left > right
                 elif op == 'chhota':
                     return left < right
-                elif op == '==':
+                elif op == 'barabar':
                     return left == right
             
             elif node.get('type') == 'variable':
                 return self.get_variable(node['name'])
+            
+            elif node.get('type') == 'function_call':
+                func_name = node['name']
+                args = [self.evaluate_expression(arg) for arg in node['args']]
+                return self.call_function(func_name, args)
         
         return node
     
@@ -157,7 +229,15 @@ class Interpreter:
     
     def execute_statement(self, stmt: Dict) -> None:
         """Execute a single statement"""
-        if stmt['type'] == 'assignment':
+        if stmt['type'] == 'function_def':
+            self.define_function(
+                stmt['name'],
+                stmt['parameters'],
+                stmt['body'],
+                stmt.get('return')
+            )
+        
+        elif stmt['type'] == 'assignment':
             value = self.evaluate_expression(stmt['value'])
             self.set_variable(stmt['name'], value)
         
@@ -171,6 +251,11 @@ class Interpreter:
                 prompt = self.evaluate_expression(prompt)
             value = self.execute_input(str(prompt))
             self.set_variable(stmt['var'], value)
+        
+        elif stmt['type'] == 'function_call':
+            func_name = stmt['name']
+            args = [self.evaluate_expression(arg) for arg in stmt['args']]
+            self.call_function(func_name, args)
         
         elif stmt['type'] == 'if':
             condition = self.evaluate_expression(stmt['condition'])
